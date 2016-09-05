@@ -1,9 +1,18 @@
 var Nightmare = require('nightmare');
 var firebase = require("firebase");
 
+var wcemail = "wcnightmare@admin.com"
+var wcpass  = "HZm66GYXk"
+
 firebase.initializeApp({
   databaseURL: "https://shield-5ec91.firebaseio.com/",
   serviceAccount: "ShieldSA.json"
+});
+
+firebase.auth().signInWithEmailAndPassword(wcemail, wcpass).catch(function (error) {
+	var errorCode = error.code;
+	var errorMessage = error.message;	
+	console.log(errorCode, + " " + errorMessage);
 });
 
 var ref = firebase.database().ref('Sites/');
