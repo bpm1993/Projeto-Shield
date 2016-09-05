@@ -2,8 +2,11 @@ var Nightmare = require('nightmare');
 var firebase = require("firebase");
 
 firebase.initializeApp({
-  databaseURL: "https://shield-5ec91.firebaseio.com/",
-  serviceAccount: "ShieldSA.json"
+	databaseURL: "https://shield-5ec91.firebaseio.com/",
+	serviceAccount: "ShieldSA.json",
+	databaseAuthVariableOverride: {
+		uid: "wcnightmare"
+	}
 });
 
 var wcemail = "wcnightmare@admin.com";
