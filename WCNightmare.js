@@ -9,20 +9,11 @@ firebase.initializeApp({
 	}
 });
 
-var wcemail = "wcnightmare@admin.com";
-var wcpass  = "HZm66GYXk";
-
 var ref = firebase.database().ref('Sites/');
 var urls = [];
 var selectors = [];
 var siteName = [];
 var time;
-
-firebase.auth().signInWithEmailAndPassword(wcemail, wcpass).catch(function (error) {
-	var errorCode = error.code;
-	var errorMessage = error.message;	
-	console.log(errorCode, + " " + errorMessage);
-});
 
 setInterval(function(){
 	time = new Date();
