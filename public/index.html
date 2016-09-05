@@ -86,7 +86,7 @@
 	</style>
 </head>
 
-<body>
+<body onunload="signOut()">
 	<div class="container" id="login">
 		<form class="form-inline col-md-offset-2">
 			<div class="form-group">
@@ -170,7 +170,6 @@
 	</div>
 	<script>
 		var count = 1;
-		var user;
 		var lastUpdate;
 		
 		var config = {
@@ -181,32 +180,45 @@
 		};
 		firebase.initializeApp(config);
 		
+		var user = firebase.auth().currentUser;
 		var statusFB = firebase.database().ref('Status/');
 		
 		function login(){
-			var email = $('#email').val()
-			var password = $('#pwd').val()
+			var email = $('#email').val();
+			var password = $('#pwd').val();
 			
-			firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-				var errorCode = error.code;
-				var errorMessage = error.message;	
-				console.log(errorCode, + " " + errorMessage);
+			
+			firebase.auth().signInWithEmailAndPassword(email, password).then(function(){
+				alert("Logado");
+				user = firebase.auth().currentUser;
+			}, function(error){
+				alert(error.message);
 			});
-			user = firebase.auth().currentUser;
-			console.log('Logado');
+			
+			$('#email').val('');
+			$('#pwd').val('');
 		}
 		
 		function signIn(){
 			var email = $('#email').val()
 			var password = $('#pwd').val()
+			var errorCode;
+			var errorMessage;
 			
-			firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-				var errorCode = error.code;
-				var errorMessage = error.message;
-				console.log(errorCode, + " " + errorMessage);
+			firebase.auth().createUserWithEmailAndPassword(email, password).then(function(){
+			
+			}, function(error){
+			
 			});
-			user = firebase.auth().currentUser;
-			console.log('Cadastrado');
+		}
+		
+		function signOut() {
+			firebase.auth().signOut().then(function() {
+				console.log('Signed Out');
+				user = firebase.auth().currentUser;
+			}, function(error) {
+				console.error('Sign Out Error', error);
+			});
 		}
 		
 		function insertSelector(){
@@ -230,7 +242,7 @@
 		}
 		
 		function submitData(){
-			if(user != null && user){
+			if(user){
 				console.log(user);
 				var selectors = [];
 				var pageName;
@@ -299,7 +311,7 @@
 			el: '#demo',
 			data: {
 				searchQuery: '',
-				gridColumns: ['Site', 'URL', 'Seletor', 'Status'],
+				gridColumns: ['Site', 'URL', 'Seletor', 'Status', 'Update'],
 				gridData: []
 			}
 		})
@@ -321,11 +333,14 @@
 							temp.push(sel.child('selector').val());
 							temp.push(status);
 						});
+						var date = String(new Date(data.child('time').val())).split(' ');
+						var stringDate = date[1] + ' ' +  date[2] + ' ' + date[3] + ' ' + date[4];
 						demo.gridData.push({
 							Site: data.key,
 							URL: temp[0],
 							Seletor: temp[1],
-							Status: temp[2]
+							Status: temp[2],
+							Update: stringDate
 						});
 					});
 				});
