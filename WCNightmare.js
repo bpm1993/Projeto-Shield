@@ -35,21 +35,13 @@ function receiveRequest(){
 				});
 			});
 		});
-		
-		callAccess();
+		if(selectors[0] != null){
+			Access(0);
+		}
 	});
 }
 
-function callAccess(){
-	for(var count = 0; count < urls.length; count++){
-		Access(count);
-	}
-	selectors = [];
-	urls = [];
-	siteName = [];
-}
-
-function Access(index){
+function Access(index){ 
 	var nightmare = Nightmare({show:false});
 	nightmare
 		.goto(urls[index])
@@ -82,8 +74,15 @@ function Access(index){
 					time:new Date()
 				})
 			}
+			if(index + 1 < urls.length){
+				Access(index + 1);
+			} else {
+				urls = [];
+				selectors = [];
+				siteName = [];
+			}
 		})
 		.catch(function (error) {
 			console.error('Search failed:', error);
-		});
+		})
 }

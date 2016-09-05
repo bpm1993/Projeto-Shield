@@ -20,12 +20,10 @@
 			color: #444;
 		}
 		
-		#table {
-			display: block;  
-			margin-right: auto;  
-			margin-left: auto;  
+		#tabela {
+			margin-bottom: 30px;
 		}
-
+		
 		table {
 			border: 2px solid #42b983;
 			border-radius: 3px;
@@ -130,7 +128,7 @@
 		<button type="button" class="btn btn-default" id ="Submit" onclick="submitData()">Finalizar</button>
 	</div>
 	
-	<div class="container" id="tabela">
+	<div class="container">
 		<script type="text/x-template" id="grid-template">
 			<table>
 				<thead>
@@ -161,7 +159,7 @@
 		<!-- demo root element -->
 		<div id="demo">
 			<form id="search">
-				Search <input name="query" v-model="searchQuery">
+				Busca <input name="query" v-model="searchQuery">
 			</form>
 			<demo-grid
 				:data="gridData"
@@ -173,6 +171,7 @@
 	<script>
 		var count = 1;
 		var user;
+		var lastUpdate;
 		
 		var config = {
 			apiKey: "AIzaSyCdVwQN5CQD7Zyuxpvr08I6m3lZxtIbUj8",
@@ -181,6 +180,8 @@
 			storageBucket: "shield-5ec91.appspot.com",
 		};
 		firebase.initializeApp(config);
+		
+		var statusFB = firebase.database().ref('Status/');
 		
 		function login(){
 			var email = $('#email').val()
@@ -293,42 +294,43 @@
 				}
 			}
 		})
-
-		function update(){
-			ref.orderByKey().on("value", function(snapshot) {
-				snapshot.forEach(function(data) {
-					siteName.push(data.key);
-					data.forEach(function(pages) {
-						urls.push(pages.child('url').val());
-						pages.forEach(function(sel){
-							var subSelectors = [];
-							sel.forEach(function(numbers){
-								subSelectors.push(numbers.child('selector').val());
-							});
-							if(subSelectors[0] != null){
-								selectors.push(subSelectors);
-							}
-						});
-					});
-				});
-				callAccess();
-			});
-		}
 		
 		var demo = new Vue({
 			el: '#demo',
 			data: {
 				searchQuery: '',
-				gridColumns: ['SiteName', 'URL', 'Seletor', 'Status'],
-				gridData: [{
-					SiteName: firebase.database().ref('/Status/').,
-					URL: , Seletor: , Status: Infinity },
-				{ SiteName: 'Chuck Norris', URL: , Seletor: , Status: Infinity },
-				{ SiteName: 'Chuck Norris', URL: , Seletor: , Status: Infinity },
-				{ SiteName: 'Chuck Norris', URL: , Seletor: , Status: Infinity }
-				]
+				gridColumns: ['Site', 'URL', 'Seletor', 'Status'],
+				gridData: []
 			}
 		})
+		
+		statusFB.on("value", function(snapshot) {
+		demo.gridData = [];
+			snapshot.forEach(function(data) {
+				data.forEach(function(pages) {
+					pages.forEach(function(sel){
+						var temp = [];
+						sel.forEach(function(numbers){
+							var status;
+							if(sel.child('status').val()){
+								status = 'On';
+							} else {
+								status = 'Off';
+							}
+							temp.push(sel.child('url').val());
+							temp.push(sel.child('selector').val());
+							temp.push(status);
+						});
+						demo.gridData.push({
+							Site: data.key,
+							URL: temp[0],
+							Seletor: temp[1],
+							Status: temp[2]
+						});
+					});
+				});
+			});
+		});
 		
 	</script>
 </body>
